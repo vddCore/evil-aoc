@@ -1,0 +1,33 @@
+#include "d12.json.lexer.vil"
+#include "d12.json.parser.vil"
+
+fn sum(node, ignore_red = true) {
+  rw val _sum = 0;
+
+  if (node.type == JsonNodeType.JOBJECT) {
+    each (rw val k, v : node.children) {
+      if (v.type == JsonNodeType.STRING) {
+        if (v.value == "red" && ignore_red) -> 0;
+      }
+
+      _sum += sum(v, ignore_red);
+    }
+  } elif (node.type == JsonNodeType.JARRAY) {
+    each (rw val k, v : node.children) {
+      _sum += sum(v, ignore_red);
+    }
+  } elif (node.type == JsonNodeType.NUMBER) {
+    _sum += node.value;
+  }
+
+  ret _sum;
+}
+
+fn main() {
+  val str = fs.file.get_text("d12.dat");
+  val parser = JsonParser::new();
+  val root = parser::parse(str);
+
+  io.println(sum(root, false));
+  io.println(sum(root, true));
+}

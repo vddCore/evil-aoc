@@ -1,0 +1,99 @@
+fn hex_to_char(code) {
+  rw val num = 0;
+
+  each (rw val _, c : code) {
+    rw val cc = str.code(c);
+
+    if (cc >= str.code("0") || cc <= str.code("9")) {
+      cc -= str.code("0");
+    } elif (cc >= str.code("a") && c <= str.code("f")) {
+      cc -= str.code("a");
+      cc += 10;
+    } elif (cc >= str.code("A") && c <= str.code("F")) {
+      cc -= str.code("A");
+      cc += 10;
+    }
+
+    num = (num << 4) | (cc & 0xF);
+    num &= 0xFF;
+  }
+
+  ret str.chr(num);
+}
+
+fn decode(line) {
+  rw val str = "";
+
+  for (rw val i = 1; i < #line - 1; i++) {
+    val c = line[i];
+
+    if (c == '\\') {
+      i++;
+
+      if (line[i] == '\\') {
+        str += "\\";
+      } elif (line[i] == "\"") {
+        str += "\"";
+      } elif (line[i] == "x") {
+        i++;
+        rw val code = "";
+        code += line[i++];
+        code += line[i];
+        str += hex_to_char(code);
+      } else {
+        str += c;
+      }
+    } else {
+      str += c;
+    }
+  }
+
+  ret str;
+}
+
+fn encode(line) {
+  rw val str = '"';
+
+  for (rw val i = 0; i < #line; i++) {
+    val c = line[i];
+
+    if (c == '"') {
+      str += '\\"';
+    } elif (c == '\\') {
+      str += '\\\\';
+    } else { str += c; }
+  }
+
+  ret str + '"';
+}
+
+fn part_1(data) {
+  rw val raw_length = 0;
+  rw val decoded_length = 0;
+
+  each (rw val _, line : data) {
+    raw_length += #str.trim(line);
+    decoded_length += #decode(line);
+  }
+
+  io.println(raw_length - decoded_length);
+}
+
+fn part_2(data) {
+  rw val raw_length = 0;
+  rw val encoded_length = 0;
+
+  each (rw val _, line : data) {
+    raw_length += #str.trim(line);
+    encoded_length += #encode(line);
+  }
+
+  io.println(encoded_length - raw_length);
+}
+
+fn main() {
+  val data = fs.file.get_lines("d8.dat");
+
+  part_1(data);
+  part_2(data);
+}

@@ -1,0 +1,52 @@
+fn last_year(data) {
+    val map = { "0,0" => 1 };
+
+    rw val x = 0, y = 0;
+
+    each (rw val i, c : data) {
+        if (c == '<') x--;
+        elif (c == '>') x++;
+        elif (c == '^') y--;
+        elif (c == 'v') y++;
+
+        val coords = @x+","+@y;
+
+        map[coords] ??= 0;
+        map[coords]++;
+    }
+
+    ret #map;
+}
+
+fn this_year(data) {
+    val map = { "0,0" => 1 };
+
+    rw val sx = 0, sy = 0,
+           rx = 0, ry = 0;
+
+    each (rw val i, c : data) {
+        if (c == '<') { if (!i || i % 2 == 0) sx--; else rx--; }
+        elif (c == '>') { if (!i || i % 2 == 0) sx++; else rx++; }
+        elif (c == '^') { if (!i || i % 2 == 0) sy--; else ry--; }
+        elif (c == 'v') { if (!i || i % 2 == 0) sy++; else ry++; }
+
+
+        if (!i || i % 2 == 0) {
+            val s_coords = @sx+","+@sy;
+            map[s_coords] ??= 0;
+            map[s_coords]++;
+        } else {
+            val r_coords = @rx+","+@ry;
+            map[r_coords] ??= 0;
+            map[r_coords]++;
+        }
+    }
+
+    ret #map;
+}
+
+fn main() {
+    val data = str.trim(fs.file.get_text("d3.dat"));
+    io.println("homes last year: " + @last_year(data));
+    io.println("homes this year: " + @this_year(data));
+}

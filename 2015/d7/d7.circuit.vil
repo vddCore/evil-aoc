@@ -1,0 +1,64 @@
+#include "d7.signal.hardwired.vil"
+#include "d7.signal.not.vil"
+#include "d7.signal.and.vil"
+#include "d7.signal.or.vil"
+#include "d7.signal.lsh.vil"
+#include "d7.signal.rsh.vil"
+
+#[vminit;noreg] fn __d7_circuit() {
+  Circuit = { new: self::fn() -> {
+    signals: { },
+
+    set_hardwired: self::fn(name, input) {
+      val signal = HardwiredSignal::new(self, input);
+      self.signals[name] = signal;
+
+      ret signal;
+    },
+
+    set_not: self::fn(name, input) {
+      val signal = NotSignal::new(self, input);
+      self.signals[name] = signal;
+
+      ret signal;
+    },
+
+    set_and: self::fn(name, input_a, input_b) {
+      val signal = AndSignal::new(self, input_a, input_b);
+      self.signals[name] = signal;
+
+      ret signal;
+    },
+
+    set_or: self::fn(name, input_a, input_b) {
+      val signal = OrSignal::new(self, input_a, input_b);
+      self.signals[name] = signal;
+
+      ret signal;
+    },
+
+    set_lsh: self::fn(name, input_a, input_b) {
+      val signal = LshSignal::new(self, input_a, input_b);
+      self.signals[name] = signal;
+
+      ret signal;
+    },
+
+    set_rsh: self::fn(name, input_a, input_b) {
+      val signal = RshSignal::new(self, input_a, input_b);
+      self.signals[name] = signal;
+
+      ret signal;
+    },
+
+    reset: self::fn() {
+      each (rw val _, signal : self.signals) {
+        signal.cached = nil;
+      }
+    },
+
+    get_signal_value: self::fn(name) {
+      ret self.signals[name]::get_value();
+    }
+  }};
+}

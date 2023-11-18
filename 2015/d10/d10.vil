@@ -1,0 +1,33 @@
+fn encode(string) {
+  rw val encoded = "";
+
+  rw val count = 1;
+  for (rw val i = 1; i <= #string; i++) {
+    val a = string[i];
+    val b = string[i - 1];
+
+    if (a == b) {
+      count++;
+    } else {
+      encoded += @count + b;
+      count = 1;
+    }
+  }
+
+  ret encoded;
+}
+
+fn main() {
+  rw val input = "1321131112";
+  rw val length = #input;
+
+  for (rw val i = 0; i < 50; i++) {
+    val start = time.stamp.ms;
+
+    input = encode(input);
+    io.print(@i + ": " + @#input + " ");
+
+    val end = time.stamp.ms;
+    io.println(@(end - start) + "ms");
+  }
+}

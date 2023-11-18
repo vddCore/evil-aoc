@@ -1,0 +1,24 @@
+fn decode(rw line) {
+  line = str.replace(line, "would gain ", "");
+  line = str.replace(line, "would lose ", "-");
+  line = str.replace(line, " happiness units by sitting next to", "");
+  line = str.rtrim(line, ".");
+  
+  val s = str.spl(line, " ");
+
+  val r = {
+    who: s[0],
+    points: $s[1],
+    neighbor: s[2]
+  };
+
+  override(r)::__tostr(r) {
+    ret r.who + " " + @r.points + " " + r.neighbor;
+  }
+
+  ret r;
+}
+
+fn main() {
+  io.println(@decode("Alice would lose 54 happiness units by sitting next to Bob."));
+}

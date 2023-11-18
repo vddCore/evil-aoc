@@ -1,0 +1,14 @@
+#[vminit;noreg] fn __d7_signal_not() {
+  NotSignal = { new: self::fn(circuit, input) -> {
+    circuit: circuit,
+    input: input,
+    cached: nil,
+
+    get_value: self::fn() {
+      if (self.cached) -> self.cached;
+
+      if (self.input is String) -> self.cached = ~(self.circuit::get_signal_value(self.input)) & 0xFFFF;
+      elif (self.input is Number) -> self.cached = self.input;
+    }
+  }};
+}

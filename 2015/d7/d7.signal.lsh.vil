@@ -1,0 +1,29 @@
+#[vminit;noreg] fn __d7_signal_lsh() {
+  LshSignal = { new: self::fn(circuit, input_a, input_b) -> {
+    circuit: circuit,
+    input_a: input_a,
+    input_b: input_b,
+    cached: nil,
+
+    get_value: self::fn() {
+      if (self.cached) -> self.cached;
+
+      rw val a = nil;
+      rw val b = nil;
+
+      if (self.input_a is String) {
+        a = self.circuit::get_signal_value(self.input_a);
+      } elif (self.input_a is Number) {
+        a = self.input_a;
+      }
+
+      if (self.input_b is String) {
+        b = self.circuit::get_signal_value(self.input_b);
+      } elif (self.input_b is Number) {
+        b = self.input_b;
+      }
+
+      ret self.cached = (a << b) & 0xFFFF;
+    }
+  }};
+}

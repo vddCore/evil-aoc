@@ -1,0 +1,70 @@
+fn part_1(data) {
+    val rule_1 = fn(s) {
+        rw val vowels = 0;
+        
+        each (rw val _, c : s) {
+            if (c == "a" 
+            ||  c == "e"
+            ||  c == "i"
+            ||  c == "o"
+            ||  c == "u") vowels++;
+        }
+
+        ret vowels >= 3;
+    };
+
+    val rule_2 = fn(s) {
+        for (rw val i = 0; i < #s - 1; i++) {
+            if (s[i] == s[i + 1]) -> true;
+        }
+
+        ret false;
+    };
+
+    val rule_3 = fn(s) -> "ab" !in s && "cd" !in s && "pq" !in s && "xy" !in s;
+
+    rw val count = 0;
+    each (rw val _, s : data) {
+        if (rule_1(s) && rule_2(s) && rule_3(s)) count++;
+    }
+
+    io.println("ruleset 1: " + @count);
+}
+
+fn part_2(data) {
+    val rule_1 = fn(s) {
+        for (rw val i = 0; i < #s - 1; i++) {
+            val pair = str.sub(s, i, i + 2);
+            
+            for (rw val j = i + 2; j < #s; j++) {
+                val pair2 = str.sub(s, j, j + 2);
+                if (pair == pair2) -> true;
+            }
+        }
+
+        ret false;
+    };
+
+    val rule_2 = fn(s) {
+        for (rw val i = 0; i < #s - 2; i++) {
+            val c = s[i];
+            if (s[i + 2] == c) -> true;
+        }
+
+        ret false;
+    };
+
+    rw val count = 0;
+    each (rw val _, s : data) {
+        if (rule_1(s) && rule_2(s)) count++;
+    }
+
+    io.println("ruleset 2: " + @count);
+}
+
+fn main() {
+    val data = fs.file.get_lines("d5.dat"); 
+
+    part_1(data);
+    part_2(data);
+}
