@@ -1,0 +1,6 @@
+val JsonNodeType = require("JsonNodeType");
+
+ret { new: self::fn(value) -> {
+  type: JsonNodeType.NUMBER,
+  value: value
+}};

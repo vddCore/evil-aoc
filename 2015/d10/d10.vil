@@ -1,4 +1,4 @@
-fn encode(string) {
+loc fn encode(string) {
   rw val encoded = "";
 
   rw val count = 1;
@@ -17,17 +17,15 @@ fn encode(string) {
   ret encoded;
 }
 
-fn main() {
-  rw val input = "1321131112";
-  rw val length = #input;
+rw val input = "1321131112";
+rw val length = #input;
 
-  for (rw val i = 0; i < 50; i++) {
-    val start = time.stamp.ms;
+for (rw val i = 0; i < 50; i++) {
+  val start = time.stamp.ms;
 
-    input = encode(input);
-    io.print(@i + ": " + @#input + " ");
+  input = encode(input);
+  io.print(@i + ": " + @#input + " ");
 
-    val end = time.stamp.ms;
-    io.println(@(end - start) + "ms");
-  }
+  val end = time.stamp.ms;
+  io.println(@(end - start) + "ms");
 }

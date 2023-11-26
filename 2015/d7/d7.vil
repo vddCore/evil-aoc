@@ -1,14 +1,11 @@
-#include "devil/tbl.vil"
-#include "d7.circuit.vil"
+val Circuit = require("classes.Circuit");
 
-#[vminit;noreg] fn __globals() {
-  opcodes = {
-    not: 0, and: 1, or: 2,
-    lsh: 3, rsh: 4, set: 5
-  };
-}
+val opcodes = {
+  not: 0, and: 1, or: 2,
+  lsh: 3, rsh: 4, set: 5
+};
 
-fn decode(line) {
+loc fn decode(line) {
   val in_out = str.spl(line, " -> ");
   val input = str.spl(in_out[0], " ");
   val r = { out: in_out[1] };
@@ -44,27 +41,25 @@ fn decode(line) {
   ret r;
 }
 
-fn main() {
-  val data = fs.file.get_lines("d7.dat");
-  val circuit = Circuit::new();
-  
-  each (rw val _, line : data) {
-    val insn = decode(line);
+val data = fs.file.get_lines("d7.dat");
+val circuit = Circuit::new();
 
-    if (insn.op == opcodes.not) { circuit::set_not(insn.out, insn.in_1); } 
-    elif (insn.op == opcodes.and) { circuit::set_and(insn.out, insn.in_1, insn.in_2); } 
-    elif (insn.op == opcodes.or) { circuit::set_or(insn.out, insn.in_1, insn.in_2); } 
-    elif (insn.op == opcodes.lsh) { circuit::set_lsh(insn.out, insn.in_1, insn.in_2); } 
-    elif (insn.op == opcodes.rsh) { circuit::set_rsh(insn.out, insn.in_1, insn.in_2); } 
-    elif (insn.op == opcodes.set) { circuit::set_hardwired(insn.out, insn.in_1); }
-  }
+each (rw val _, line : data) {
+  val insn = decode(line);
 
-  rw val wire_a = circuit::get_signal_value("a");
-  io.println("wire a before change: " + @wire_a);
-
-  circuit::reset();
-  circuit::set_hardwired("b", wire_a);
-  
-  wire_a = circuit::get_signal_value("a");
-  io.println("wire a after change: " + @wire_a);
+  if (insn.op == opcodes.not) { circuit::set_not(insn.out, insn.in_1); } 
+  elif (insn.op == opcodes.and) { circuit::set_and(insn.out, insn.in_1, insn.in_2); } 
+  elif (insn.op == opcodes.or) { circuit::set_or(insn.out, insn.in_1, insn.in_2); } 
+  elif (insn.op == opcodes.lsh) { circuit::set_lsh(insn.out, insn.in_1, insn.in_2); } 
+  elif (insn.op == opcodes.rsh) { circuit::set_rsh(insn.out, insn.in_1, insn.in_2); } 
+  elif (insn.op == opcodes.set) { circuit::set_hardwired(insn.out, insn.in_1); }
 }
+
+rw val wire_a = circuit::get_signal_value("a");
+io.println("wire a before change: " + @wire_a);
+
+circuit::reset();
+circuit::set_hardwired("b", wire_a);
+
+wire_a = circuit::get_signal_value("a");
+io.println("wire a after change: " + @wire_a);

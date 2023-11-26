@@ -1,4 +1,4 @@
-fn last_year(data) {
+loc fn last_year(data) {
     val map = { "0,0" => 1 };
 
     rw val x = 0, y = 0;
@@ -18,7 +18,7 @@ fn last_year(data) {
     ret #map;
 }
 
-fn this_year(data) {
+loc fn this_year(data) {
     val map = { "0,0" => 1 };
 
     rw val sx = 0, sy = 0,
@@ -45,8 +45,6 @@ fn this_year(data) {
     ret #map;
 }
 
-fn main() {
-    val data = str.trim(fs.file.get_text("d3.dat"));
-    io.println("homes last year: " + @last_year(data));
-    io.println("homes this year: " + @this_year(data));
-}
+val data = str.trim(fs.file.get_text("d3.dat"));
+io.println("homes last year: " + @last_year(data));
+io.println("homes this year: " + @this_year(data));

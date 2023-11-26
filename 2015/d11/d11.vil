@@ -1,7 +1,7 @@
-fn roll(password, alphabet) {
+loc fn roll(password, alphabet) {
   for (rw val i = #password - 1; i >= 0; i--) {
     val c = password[i];
-    rw val ind = arr.indof(alphabet, c) + 1;
+    rw val ind = arr.index_of(alphabet, c) + 1;
 
     if (ind >= #alphabet) {
       ind = 0;
@@ -13,11 +13,11 @@ fn roll(password, alphabet) {
   }
 }
 
-fn validate(password, alphabet) {
-  val rule_1 = fn(password) {
+loc fn validate(password, alphabet) {
+  loc fn rule_1(password) {
     for (rw val i = 0; i < #password - 2; i++) {
       val c = password[i];
-      val ind = arr.indof(alphabet, c);
+      val ind = arr.index_of(alphabet, c);
 
       if (ind + 2 >= #alphabet) -> false;
 
@@ -27,9 +27,9 @@ fn validate(password, alphabet) {
     }
 
     ret false;
-  };
+  }
 
-  val rule_2 = fn(password) {
+  loc fn rule_2(password) {
     val pairs = array { };
     for (rw val i = 0; i < #password - 1; i++) {
       if (password[i] == password[i + 1]) {
@@ -41,27 +41,25 @@ fn validate(password, alphabet) {
     }
 
     ret #pairs >= 2;
-  };
+  }
 
-  val rule_3 = fn(password) -> ("i" !in password) 
-                            && ("o" !in password)
-                            && ("l" !in password);
+  loc fn rule_3(password) -> ("i" !in password) 
+                          && ("o" !in password)
+                          && ("l" !in password);
 
   ret rule_3(password) && rule_2(password) && rule_1(password);
 }
 
-fn main() {
-  val alphabet = str.explode("abcdefghijklmnopqrstuvwxyz");
-  val password = str.explode("hxbzsvyh");
+val alphabet = str.explode("abcdefghijklmnopqrstuvwxyz");
+val password = str.explode("hxbzsvyh");
 
-  rw val i = 0;
-  do {   
-    roll(password, alphabet);
+rw val i = 0;
+do {   
+  roll(password, alphabet);
 
-  } while (!validate(password, alphabet));
+} while (!validate(password, alphabet));
 
-  each (rw val k, v : password) {
-    io.print(v);
-  }
-  io.println();
+each (rw val k, v : password) {
+  io.print(v);
 }
+io.println();

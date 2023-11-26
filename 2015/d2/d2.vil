@@ -1,40 +1,38 @@
-fn main() {
-    val lines = fs.file.get_lines("d2.dat");
-    rw val total_sqft = 0;
-    rw val total_ribbon = 0;
+val lines = fs.file.get_lines("d2.dat");
+rw val total_sqft = 0;
+rw val total_ribbon = 0;
 
-    each (rw val i, s : lines) {
-        if (!#s) skip;
+each (rw val i, s : lines) {
+  if (!#s) skip;
 
-        val spl = str.spl(str.trim(s), "x");
-        val dims = { l: $spl[0], w: $spl[1], h: $spl[2] };
+  val spl = str.spl(str.trim(s), "x");
+  val dims = { l: $spl[0], w: $spl[1], h: $spl[2] };
 
-        val sides = { 
-            a: 2 * dims.l * dims.w,
-            b: 2 * dims.w * dims.h,
-            c: 2 * dims.h * dims.l,
-        };
+  val sides = { 
+    a: 2 * dims.l * dims.w,
+    b: 2 * dims.w * dims.h,
+    c: 2 * dims.h * dims.l
+  };
 
-        val box_area = sides.a
-                     + sides.b
-                     + sides.c;
+  val box_area = sides.a
+               + sides.b
+               + sides.c;
 
-        val slack = math.min(math.min(sides.a / 2, sides.b / 2), sides.c / 2);
+  val slack = math.min(math.min(sides.a / 2, sides.b / 2), sides.c / 2);
 
-        total_sqft += box_area + slack;
+  total_sqft += box_area + slack;
 
-        val perimeters = {
-            a: 2 * (dims.l + dims.w),
-            b: 2 * (dims.w + dims.h),
-            c: 2 * (dims.h + dims.l)
-        };
-        
-        val wrap = math.min(math.min(perimeters.a, perimeters.b), perimeters.c);
-        val bow = dims.l * dims.w * dims.h;
+  val perimeters = {
+    a: 2 * (dims.l + dims.w),
+    b: 2 * (dims.w + dims.h),
+    c: 2 * (dims.h + dims.l)
+  };
+  
+  val wrap = math.min(math.min(perimeters.a, perimeters.b), perimeters.c);
+  val bow = dims.l * dims.w * dims.h;
 
-        total_ribbon += bow + wrap;
-    }
-
-    io.println("paper: " + @total_sqft);
-    io.println("ribbon: " + @total_ribbon);
+  total_ribbon += bow + wrap;
 }
+
+io.println("paper: " + @total_sqft);
+io.println("ribbon: " + @total_ribbon);

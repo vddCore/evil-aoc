@@ -1,4 +1,4 @@
-fn part_1(data) {
+loc fn part_1(data) {
     val rule_1 = fn(s) {
         rw val vowels = 0;
         
@@ -31,7 +31,7 @@ fn part_1(data) {
     io.println("ruleset 1: " + @count);
 }
 
-fn part_2(data) {
+loc fn part_2(data) {
     val rule_1 = fn(s) {
         for (rw val i = 0; i < #s - 1; i++) {
             val pair = str.sub(s, i, i + 2);
@@ -62,9 +62,7 @@ fn part_2(data) {
     io.println("ruleset 2: " + @count);
 }
 
-fn main() {
-    val data = fs.file.get_lines("d5.dat"); 
+val data = fs.file.get_lines("d5.dat"); 
 
-    part_1(data);
-    part_2(data);
-}
+part_1(data);
+part_2(data);

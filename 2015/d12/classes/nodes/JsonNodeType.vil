@@ -1,0 +1,6 @@
+ret {
+  JOBJECT: 0,
+  JARRAY: 1,
+  STRING: 2,
+  NUMBER: 3
+};

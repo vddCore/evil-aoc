@@ -1,6 +1,4 @@
-#include "devil/tbl.vil"
-
-fn decode(line) {
+loc fn decode(line) {
   val s1 = str.spl(line, " = ");
   val s2 = str.spl(s1[0], " to ");
 
@@ -11,13 +9,13 @@ fn decode(line) {
   };
 }
 
-fn invert_route(object) -> {
+loc fn invert_route(object) -> {
   from: object.to,
   to: object.from,
   distance: object.distance
 };
 
-fn get_unique_locations(objects) {
+loc fn get_unique_locations(objects) {
   val locations = array { };
   
   each (rw val _, o : objects) {
@@ -33,7 +31,7 @@ fn get_unique_locations(objects) {
   ret locations;
 }
 
-fn construct_paths(locations) {
+loc fn construct_paths(locations) {
   val swap = fn(a, i, j) {
     val t = a[i];
     a[i] = a[j];
@@ -78,17 +76,17 @@ fn construct_paths(locations) {
   ret paths;
 }
 
-fn calculate_distance(path, locations) {
+loc fn calculate_distance(path, locations) {
   rw val total_route_distance = 0;
   val segments = str.spl(path, ":");
 
   for (rw val i = 0; i < #segments - 1; i++) {
     total_route_distance += fn(a, b) {
       for (rw val i = 0; i < #locations; i++) {
-        val loc = locations[i];
+        val location = locations[i];
 
-        if (loc.from == a && loc.to == b) {
-          ret loc.distance;
+        if (location.from == a && location.to == b) {
+          ret location.distance;
         }
       }
     } (segments[i], segments[i + 1]);
@@ -97,36 +95,34 @@ fn calculate_distance(path, locations) {
   ret total_route_distance;
 }
 
-fn main() {
-  val lines = fs.file.get_lines("d9.dat");
-  val objects = array { };
+val lines = fs.file.get_lines("d9.dat");
+val objects = array { };
 
-  each (rw val _, line : lines) {
-    val object = decode(line);
-    val reverse = invert_route(object);
+each (rw val _, line : lines) {
+  val object = decode(line);
+  val reverse = invert_route(object);
 
-    arr.push(objects, object);
-    arr.push(objects, reverse);
-  }
-
-  val locations = get_unique_locations(objects);
-  val paths = construct_paths(locations);
-  val distances = array { };
-  each (rw val _, path : paths) {
-    arr.push(
-      distances,
-      calculate_distance(
-        path, objects
-      )
-    );
-  }
-
-  rw val minimum = distances[0];
-  rw val maximum = distances[0];
-  each (rw val _, dst : distances) {
-    if (dst < minimum) minimum = dst;
-    if (dst > maximum) maximum = dst;
-  }
-
-  io.println(minimum, maximum);
+  arr.push(objects, object);
+  arr.push(objects, reverse);
 }
+
+val locations = get_unique_locations(objects);
+val paths = construct_paths(locations);
+val distances = array { };
+each (rw val _, path : paths) {
+  arr.push(
+    distances,
+    calculate_distance(
+      path, objects
+    )
+  );
+}
+
+rw val minimum = distances[0];
+rw val maximum = distances[0];
+each (rw val _, dst : distances) {
+  if (dst < minimum) minimum = dst;
+  if (dst > maximum) maximum = dst;
+}
+
+io.println(minimum, maximum);

@@ -1,0 +1,12 @@
+val JsonNodeType = require("JsonNodeType");
+
+ret { new: self::fn() -> {
+  type: JsonNodeType.JOBJECT,
+  parent: nil,
+  children: { },
+
+  add_child: self::fn(key, child) {
+    self.children[key] = child;
+    child.parent = self;
+  }
+}};

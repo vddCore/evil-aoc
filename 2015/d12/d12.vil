@@ -1,5 +1,5 @@
-#include "d12.json.lexer.vil"
-#include "d12.json.parser.vil"
+val JsonNodeType = require("classes.nodes.JsonNodeType");
+val JsonParser = require("classes.JsonParser");
 
 fn sum(node, ignore_red = true) {
   rw val _sum = 0;
@@ -23,11 +23,9 @@ fn sum(node, ignore_red = true) {
   ret _sum;
 }
 
-fn main() {
-  val str = fs.file.get_text("d12.dat");
-  val parser = JsonParser::new();
-  val root = parser::parse(str);
+val str = fs.file.get_text("d12.dat");
+val parser = JsonParser::new();
+val root = parser::parse(str);
 
-  io.println(sum(root, false));
-  io.println(sum(root, true));
-}
+io.println(sum(root, false));
+io.println(sum(root, true));

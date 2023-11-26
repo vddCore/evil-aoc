@@ -1,149 +1,119 @@
-#include "devil/tbl.vil"
+Light = require("classes.Light");
 
-#[vminit;noreg] fn __globals() {
-    actions = {
-        turn_on: 0,
-        turn_off: 1,
-        toggle: 2
+val actions = {
+  turn_on: 0,
+  turn_off: 1,
+  toggle: 2
+};
+
+loc fn decode(line) {
+  val data = str.spl(line, " ");
+  val r = { };
+
+  if (data[0] == "turn") {
+    if (data[1] == "on") {
+      r.action = actions.turn_on;
+    } else {
+      r.action = actions.turn_off;
+    }
+
+    val start = str.spl(data[2], ",");
+    r.start = {
+      x: $start[0],
+      y: $start[1]
     };
 
-    Light = { new: self::fn(x, y) -> {
-        x: x,
-        y: y,
-        power: 0,
-
-        toggle: self::fn() {
-            if (self.power == 0) self.power = 1; else self.power = 0;
-        },
-
-        turn_on: self::fn() {
-            self.power = 1;
-        },
-
-        turn_off: self::fn() {
-            self.power = 0;
-        },
-
-        brighten: self::fn(by) {
-            self.power += by;
-        },
-
-        darken: self::fn() {
-            if (self.power - 1 < 0) ret;
-            self.power--;
-        }
-    }};
-}
-
-fn decode(line) {
-    val data = str.spl(line, " ");
-    val r = { };
-
-    if (data[0] == "turn") {
-        if (data[1] == "on") {
-            r.action = actions.turn_on;
-        } else {
-            r.action = actions.turn_off;
-        }
-
-        val start = str.spl(data[2], ",");
-        r.start = {
-            x: $start[0],
-            y: $start[1]
-        };
-
-        val end = str.spl(data[4], ",");
-        r.end = {
-            x: $end[0],
-            y: $end[1]
-        };
-    } else {
-        r.action = actions.toggle;
-        
-        val start = str.spl(data[1], ",");
-        r.start = {
-            x: $start[0],
-            y: $start[1]
-        };
-
-        val end = str.spl(data[3], ",");
-        r.end = {
-            x: $end[0],
-            y: $end[1]
-        };
-    }
-
-    ret r;
-}
-
-fn part_1(data) {
-    val map = { };
+    val end = str.spl(data[4], ",");
+    r.end = {
+      x: $end[0],
+      y: $end[1]
+    };
+  } else {
+    r.action = actions.toggle;
     
-    each (rw val i, line : data) {
-        io.println(@i + ": " +  @line);
-        val insn = decode(line);
-        io.println(tbl.dump(insn));
+    val start = str.spl(data[1], ",");
+    r.start = {
+      x: $start[0],
+      y: $start[1]
+    };
 
-        for (rw val y = insn.start.y; y <= insn.end.y; y++) {
-            for (rw val x = insn.start.x; x <= insn.end.x; x++) {
-                val coords = @x+","+@y;
+    val end = str.spl(data[3], ",");
+    r.end = {
+      x: $end[0],
+      y: $end[1]
+    };
+  }
 
-                map[coords] ??= Light::new(x, y);
+  ret r;
+}
 
-                if (insn.action == actions.turn_on) {
-                    map[coords]::turn_on();
-                } elif (insn.action == actions.turn_off) {
-                    map[coords]::turn_off();
-                } elif (insn.action == actions.toggle) {
-                    map[coords]::toggle();
-                }
-            }
+loc fn part_1(data) {
+  val map = { };
+  
+  each (rw val i, line : data) {
+    io.println(line);
+    val insn = decode(line);
+    val sx = insn.start.y;
+    val ex = insn.end.x;
+
+    val sy = insn.start.y;
+    val ey = insn.end.y;
+    for (rw val y = sy; y <= ey; y++) {
+      for (rw val x = sx; x <= ex; x++) {
+        val coords = @x+","+@y;
+
+        map[coords] ??= Light::new(x, y);
+
+        if (insn.action == actions.turn_on) {
+          map[coords]::turn_on();
+        } elif (insn.action == actions.turn_off) {
+          map[coords]::turn_off();
+        } elif (insn.action == actions.toggle) {
+          map[coords]::toggle();
         }
+      }
     }
+  }
 
-    rw val lit = 0;
-    each (rw val _, light : map) {
-        if (light.power > 0) lit++;
-    }
+  rw val lit = 0;
+  each (rw val _, light : map) {
+    if (light.power > 0) lit++;
+  }
 
-    io.println("attempt 1: " + @lit);
+  io.println("attempt 1: " + @lit);
 }
 
-fn part_2(data) {
-    val map = { };
+loc fn part_2(data) {
+  val map = { };
 
-    each (rw val i, line : data) {
-        io.println(@i + ": " +  @line);
-        val insn = decode(line);
-        io.println(tbl.dump(insn));
+  each (rw val i, line : data) {
+    val insn = decode(line);
 
-        for (rw val y = insn.start.y; y <= insn.end.y; y++) {
-            for (rw val x = insn.start.x; x <= insn.end.x; x++) {
-                val coords = @x+","+@y;
+    for (rw val y = insn.start.y; y <= insn.end.y; y++) {
+      for (rw val x = insn.start.x; x <= insn.end.x; x++) {
+        val coords = @x+","+@y;
 
-                map[coords] ??= Light::new(x, y);
+        map[coords] ??= Light::new(x, y);
 
-                if (insn.action == actions.turn_on) {
-                    map[coords]::brighten(1);
-                } elif (insn.action == actions.turn_off) {
-                    map[coords]::darken();
-                } elif (insn.action == actions.toggle) {
-                    map[coords]::brighten(2);
-                }
-            }
+        if (insn.action == actions.turn_on) {
+          map[coords]::brighten(1);
+        } elif (insn.action == actions.turn_off) {
+          map[coords]::darken();
+        } elif (insn.action == actions.toggle) {
+          map[coords]::brighten(2);
         }
+      }
     }
+  }
 
-    rw val total_pwr = 0;
-    each (rw val _, light : map) {
-        total_pwr += light.power;
-    }
+  rw val total_pwr = 0;
+  each (rw val _, light : map) {
+    total_pwr += light.power;
+  }
 
-    io.println("attempt 2: " + @total_pwr);
+  io.println("attempt 2: " + @total_pwr);
 }
 
-fn main() {
-    val data = fs.file.get_lines("d6.dat");
-    // part_1(data);
-    part_2(data);
-}
+val data = fs.file.get_lines("d6.dat");
+part_1(data);
+part_2(data);

@@ -1,0 +1,12 @@
+val JsonNodeType = require("JsonNodeType");
+
+ret { new: self::fn() -> {
+  type: JsonNodeType.JARRAY,
+  parent: nil,
+  children: array { },
+
+  add_child: self::fn(child) {
+    arr.push(self.children, child);
+    child.parent = self;
+  }
+}};

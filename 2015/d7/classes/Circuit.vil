@@ -1,0 +1,62 @@
+val HardwiredSignal = require("Signal.Hardwired");
+val NotSignal = require("Signal.Not");
+val AndSignal = require("Signal.And");
+val OrSignal = require("Signal.Or");
+val LshSignal = require("Signal.Lsh");
+val RshSignal = require("Signal.Rsh");
+
+ret { new: self::fn() -> {
+  signals: { },
+
+  set_hardwired: self::fn(name, input) {
+    val signal = HardwiredSignal::new(self, input);
+    self.signals[name] = signal;
+
+    ret signal;
+  },
+
+  set_not: self::fn(name, input) {
+    val signal = NotSignal::new(self, input);
+    self.signals[name] = signal;
+
+    ret signal;
+  },
+
+  set_and: self::fn(name, input_a, input_b) {
+    val signal = AndSignal::new(self, input_a, input_b);
+    self.signals[name] = signal;
+
+    ret signal;
+  },
+
+  set_or: self::fn(name, input_a, input_b) {
+    val signal = OrSignal::new(self, input_a, input_b);
+    self.signals[name] = signal;
+
+    ret signal;
+  },
+
+  set_lsh: self::fn(name, input_a, input_b) {
+    val signal = LshSignal::new(self, input_a, input_b);
+    self.signals[name] = signal;
+
+    ret signal;
+  },
+
+  set_rsh: self::fn(name, input_a, input_b) {
+    val signal = RshSignal::new(self, input_a, input_b);
+    self.signals[name] = signal;
+
+    ret signal;
+  },
+
+  reset: self::fn() {
+    each (rw val _, signal : self.signals) {
+      signal.cached = nil;
+    }
+  },
+
+  get_signal_value: self::fn(name) {
+    ret self.signals[name]::get_value();
+  }
+}};

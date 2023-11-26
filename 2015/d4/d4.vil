@@ -1,27 +1,25 @@
-fn main() {
-    val key = "bgvyzdsv";
-    rw val token = 0;
+val key = "bgvyzdsv";
+rw val token = 0;
 
-    while (true) {
-        val md5 = str.md5(key + @token);
+while (true) {
+    val md5 = str.md5(key + @token);
 
-        if (str.starts_with(md5, "00000")) {
-            io.println("5-digit: " + @token);
-            break;
-        }
-
-        token++;
+    if (str.starts_with(md5, "00000")) {
+        io.println("5-digit: " + @token);
+        break;
     }
 
-    token = 0;
-    while (true) {
-        val md5 = str.md5(key + @token);
+    token++;
+}
 
-        if (str.starts_with(md5, "000000")) {
-            io.println("6-digit: " + @token);
-            break;
-        }
+token = 0;
+while (true) {
+    val md5 = str.md5(key + @token);
 
-        token++;
+    if (str.starts_with(md5, "000000")) {
+        io.println("6-digit: " + @token);
+        break;
     }
+
+    token++;
 }

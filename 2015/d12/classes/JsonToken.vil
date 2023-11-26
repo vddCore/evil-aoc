@@ -1,0 +1,11 @@
+ret {
+  EOF: -1,
+  L_BRACKET: 0,
+  R_BRACKET: 1,
+  L_BRACE: 2,
+  R_BRACE: 3,
+  COMMA: 4,
+  COLON: 5,
+  NUM_LITERAL: 6,
+  STR_LITERAL: 7
+};
