@@ -1,7 +1,7 @@
 val JsonNodeType = require("classes.nodes.JsonNodeType");
 val JsonParser = require("classes.JsonParser");
 
-fn sum(node, ignore_red = true) {
+loc fn sum(node, ignore_red = true) {
   rw val _sum = 0;
 
   if (node.type == JsonNodeType.JOBJECT) {

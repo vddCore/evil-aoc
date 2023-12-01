@@ -1,9 +1,6 @@
 val Circuit = require("classes.Circuit");
 
-val opcodes = {
-  not: 0, and: 1, or: 2,
-  lsh: 3, rsh: 4, set: 5
-};
+val opcodes = { not: 0, and: 1, or: 2, lsh: 3, rsh: 4, set: 5 };
 
 loc fn decode(line) {
   val in_out = str.spl(line, " -> ");
@@ -43,23 +40,25 @@ loc fn decode(line) {
 
 val data = fs.file.get_lines("d7.dat");
 val circuit = Circuit::new();
+val jumptable = {
+  [opcodes.not] => fn(circuit, insn) -> circuit::set_not(insn.out, insn.in_1),
+  [opcodes.and] => fn(circuit, insn) -> circuit::set_and(insn.out, insn.in_1, insn.in_2),
+   [opcodes.or] => fn(circuit, insn) -> circuit::set_or(insn.out, insn.in_1, insn.in_2),
+  [opcodes.lsh] => fn(circuit, insn) -> circuit::set_lsh(insn.out, insn.in_1, insn.in_2),
+  [opcodes.rsh] => fn(circuit, insn) -> circuit::set_rsh(insn.out, insn.in_1, insn.in_2),
+  [opcodes.set] => fn(circuit, insn) -> circuit::set_hardwired(insn.out, insn.in_1),
+};
 
 each (rw val _, line : data) {
   val insn = decode(line);
-
-  if (insn.op == opcodes.not) { circuit::set_not(insn.out, insn.in_1); } 
-  elif (insn.op == opcodes.and) { circuit::set_and(insn.out, insn.in_1, insn.in_2); } 
-  elif (insn.op == opcodes.or) { circuit::set_or(insn.out, insn.in_1, insn.in_2); } 
-  elif (insn.op == opcodes.lsh) { circuit::set_lsh(insn.out, insn.in_1, insn.in_2); } 
-  elif (insn.op == opcodes.rsh) { circuit::set_rsh(insn.out, insn.in_1, insn.in_2); } 
-  elif (insn.op == opcodes.set) { circuit::set_hardwired(insn.out, insn.in_1); }
+  jumptable[insn.op](circuit, insn);
 }
 
 rw val wire_a = circuit::get_signal_value("a");
-io.println("wire a before change: " + @wire_a);
+io.println("wire a before change: $wire_a");
 
 circuit::reset();
 circuit::set_hardwired("b", wire_a);
 
 wire_a = circuit::get_signal_value("a");
-io.println("wire a after change: " + @wire_a);
+io.println("wire a after change: $wire_a");
