@@ -1,0 +1,40 @@
+require("classes.Pawn");
+
+val IPawnDirection = tbl.invert(PawnDirection);
+
+val data = fs.file.get_text("d1.dat");
+val instructions = str.spl(data, ", ");
+
+loc fn part_1() {
+  val pawn = Pawn::new();
+
+  each (rw val _, instruction : instructions) {
+    pawn::follow_instruction(instruction);
+  }
+
+  io.println(@pawn::distance_from_start());
+}
+
+loc fn part_2() {
+  val pawn = Pawn::new();
+  val locations = { };
+
+  each (rw val _, instruction : instructions) {
+    rw val coord = "";
+
+    pawn::follow_instruction(instruction, fn(x, y) {
+      coord = @x + ',' + @y;
+      locations[coord] ??= 0;
+      locations[coord]++;
+
+      ret locations[coord] >= 2;
+    });
+
+    if (locations[coord] >= 2) break;
+  }
+
+  io.println(@pawn::distance_from_start());
+}
+
+part_1();
+part_2();
