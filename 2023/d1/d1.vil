@@ -38,12 +38,11 @@ loc fn find_calibration_with_words(line) {
       rw val word = "";
 
       for (rw val j = i; j < #line; j++) {
-        rw val found = false;
         while (is_letter(line[j])) {
           word += line[j++];
 
           if (map[word] !is Nil) {
-            found = true;
+            j = #line;
             push(digits, map[word]);
             word = "";
           } 
@@ -53,8 +52,6 @@ loc fn find_calibration_with_words(line) {
             break;
           }
         }
-
-        if (found) break;
       }
     }
   }
