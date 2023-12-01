@@ -1,0 +1,57 @@
+val lines = fs.file.get_lines("d2.dat");
+
+val moves = {
+  U: { x:  0, y: -1 },
+  D: { x:  0, y:  1 },
+  L: { x: -1, y:  0 },
+  R: { x:  1, y:  0 }
+};
+
+loc fn solve_keypad(keypad, start_x, start_y) {
+  if (keypad !is Table) -> core.fail("Keypad must be a table.");
+  if (start_x !is Number || start_y !is Number) -> core.fail("Starting X and Y must be numbers.");
+
+  rw val x = start_x, y = start_y;
+  rw val code = "";
+
+  each (rw val _, line : lines) {
+    each (rw val __, move : line) {
+      val change = moves[move];
+
+      if (keypad[y + change.y] is Nil || keypad[y + change.y][x + change.x] is Nil)
+        skip;
+
+      x += change.x;
+      y += change.y;
+    }
+
+    code += keypad[y][x];
+  }
+
+  ret code;
+}
+
+loc fn part_1() {
+  val keypad = {
+    { "1", "2", "3" },
+    { "4", "5", "6" },
+    { "7", "8", "9" }
+  };
+
+  ret solve_keypad(keypad, 1, 1);
+}
+
+loc fn part_2() {
+  val keypad = {
+    { nil, nil, "1", nil, nil },
+    { nil, "2", "3", "4", nil },
+    { "5", "6", "7", "8", "9" },
+    { nil, "A", "B", "C", nil },
+    { nil, nil, "D", nil, nil }
+  };
+
+  ret solve_keypad(keypad, 0, 2);
+}
+
+io.println(part_1());
+io.println(part_2());
