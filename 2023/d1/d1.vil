@@ -1,0 +1,87 @@
+val strcode = str.code;
+
+loc fn is_digit(chr) -> strcode(chr) >= 0x30 && strcode(chr) <= 0x39;
+loc fn is_upper(chr) -> strcode(chr) >= 0x41 && strcode(chr) <= 0x5A;
+loc fn is_lower(chr) -> strcode(chr) >= 0x61 && strcode(chr) <= 0x7A;
+loc fn is_letter(chr) -> is_upper(chr) || is_lower(chr);
+
+loc fn find_calibration_digits_only(line) {
+  val strcode = str.code;
+  val push = arr.push;
+
+  val digits = array { };
+  for (rw val i = 0; i < #line; i++) {
+    val char = line[i];
+
+    if (is_digit(char)) {
+      push(digits, char);
+    }
+  }
+
+  ret $(digits[0] + digits[#digits - 1]);
+}
+
+loc fn find_calibration_with_words(line) {
+  val push = arr.push;
+  
+  val map = { 
+    one: '1', two: '2', three: '3',
+    four: '4', five: '5', six: '6',
+    seven: '7', eight: '8', nine: '9'
+  };
+
+  val digits = array { };
+  for (rw val i = 0; i < #line; i++) {
+    if (is_digit(line[i])) {
+      push(digits, line[i]);
+    } else {
+      rw val word = "";
+
+      for (rw val j = i; j < #line; j++) {
+        rw val found = false;
+        while (is_letter(line[j])) {
+          word += line[j++];
+
+          if (map[word] !is Nil) {
+            found = true;
+            push(digits, map[word]);
+            word = "";
+          } 
+
+          if (j >= #line) {
+            word = "";
+            break;
+          }
+        }
+
+        if (found) break;
+      }
+    }
+  }
+
+  ret $(digits[0] + digits[#digits - 1]);
+}
+
+loc fn part_1(data) {
+  rw val sum = 0;
+
+  each (rw val i, line : data) {
+    sum += find_calibration_digits_only(line) ?? 0;
+  }
+
+  io.println(sum);
+}
+
+loc fn part_2(data) {
+  rw val sum = 0;
+
+  each (rw val i, line : data) {
+    sum += find_calibration_with_words(line) ?? 0;
+  }
+
+  io.println(sum);
+}
+
+val lines = fs.file.get_lines("d1.dat");
+part_1(lines);
+part_2(lines);
