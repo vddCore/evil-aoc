@@ -9,9 +9,9 @@ loc fn part_1() {
   each (rw val line : lines) {
     val matches = str.rmatch(line, num_regex);
 
-    val a = $matches[0].groups[2].value;
-    val b = $matches[1].groups[2].value;
-    val c = $matches[2].groups[2].value;
+    val a = $matches[0].groups["number"].value;
+    val b = $matches[1].groups["number"].value;
+    val c = $matches[2].groups["number"].value;
 
     valid_tris += $Triangle::new(a, b, c)::is_valid();
   }
@@ -30,21 +30,21 @@ loc fn part_2() {
     };
 
     valid_tris += $Triangle::new(
-      $matches[0][0].groups[2].value,
-      $matches[1][0].groups[2].value,
-      $matches[2][0].groups[2].value,
+      $matches[0][0].groups["number"].value,
+      $matches[1][0].groups["number"].value,
+      $matches[2][0].groups["number"].value,
     )::is_valid();
 
     valid_tris += $Triangle::new(
-      $matches[0][1].groups[2].value,
-      $matches[1][1].groups[2].value,
-      $matches[2][1].groups[2].value,
+      $matches[0][1].groups["number"].value,
+      $matches[1][1].groups["number"].value,
+      $matches[2][1].groups["number"].value,
     )::is_valid();
 
     valid_tris += $Triangle::new(
-      $matches[0][2].groups[2].value,
-      $matches[1][2].groups[2].value,
-      $matches[2][2].groups[2].value,
+      $matches[0][2].groups["number"].value,
+      $matches[1][2].groups["number"].value,
+      $matches[2][2].groups["number"].value,
     )::is_valid();
   }
 
