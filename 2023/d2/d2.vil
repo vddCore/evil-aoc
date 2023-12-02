@@ -1,0 +1,95 @@
+val lines = fs.file.get_lines("d2.dat");
+
+loc fn decode(line) {
+  val decoded_data = { 
+    id: -1,
+    rolls: nil // Array
+  };
+
+  val id_game_split = str.spl(line, ": ");
+  decoded_data.id = $str.spl(id_game_split[0], " ")[1];
+
+  val game_strings = str.spl(id_game_split[1], ";");
+  decoded_data.rolls = array(#game_strings);
+
+  for (rw val i = 0; i < #game_strings; i++) {
+    val game_string = str.trim(game_strings[i]);
+    val cubes = str.spl(game_string, ", ");
+    val roll = { };
+
+    each (rw val _, cube : cubes) {
+      val segments = str.spl(cube, " ");
+      roll[str.trim(segments[1])] = $str.trim(segments[0]);
+    }
+
+    decoded_data.rolls[i] = roll;
+  }
+
+  ret decoded_data;
+}
+
+loc fn part_1() {
+  val MAX_RED = 12;
+  val MAX_GREEN = 13;
+  val MAX_BLUE = 14;
+
+  rw val sum = 0;
+  
+  each (rw val _, line : lines) {
+    rw val add_to_sum = true;
+    val game = decode(line);
+
+    each (rw val roll_id, roll : game.rolls) {
+      each (rw val color, count : roll) {
+        if (color == "red") {
+          add_to_sum &= count <= MAX_RED;
+        } elif (color == "green") {
+          add_to_sum &= count <= MAX_GREEN;
+        } elif (color == "blue") {
+          add_to_sum &= count <= MAX_BLUE;
+        }
+      }
+
+      if (!add_to_sum) break;
+    }
+
+    if (add_to_sum) {
+      sum += game.id;
+    }
+  }
+
+  io.println(sum);
+}
+
+loc fn part_2() {
+  rw val power_sums = 0;
+  
+  each (rw val _, line : lines) {
+    rw val fewest_red = 0;
+    rw val fewest_green = 0;
+    rw val fewest_blue = 0;
+
+    val game = decode(line);
+
+    each (rw val roll_id, roll : game.rolls) {
+      if (roll.red) {
+        if (fewest_red < roll.red) fewest_red = roll.red;
+      }
+
+      if (roll.green) {
+        if (fewest_green < roll.green) fewest_green = roll.green;
+      }
+
+      if (roll.blue) {
+        if (fewest_blue < roll.blue) fewest_blue = roll.blue;
+      }
+    }
+
+    power_sums += fewest_red * fewest_green * fewest_blue;
+  }
+
+  io.println(power_sums);
+}
+
+part_1();
+part_2();
