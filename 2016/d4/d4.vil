@@ -1,0 +1,110 @@
+val lines = fs.file.get_lines("d4.dat");
+val regex = "(?<room_name>((\\w+)-)+)(?<room_id>\\d+)\\[(?<checksum>\\w+)]";
+val alphabet = str.explode("abcdefghijklmnopqrstuvwxyz");
+
+loc fn count_and_sort_letter_occurrences(line) {
+  val counts = array { };
+
+  val table = { };
+  each (rw val c : line) {
+    if (c == '-') skip;
+
+    table[c] ??= 0;
+    table[c]++;
+  }
+
+  each (rw val char, count : table) {
+    arr.push(counts, { char: char, count: count });
+  }
+
+  for (rw val i = 0; i < #counts - 1; i++) {
+    for (rw val j = 0; j < #counts - i - 1; j++) {
+      if (str.code(counts[j].char) > str.code(counts[j + 1].char)) {
+        val tmp = counts[j];
+        counts[j] = counts[j + 1];
+        counts[j + 1] = tmp;
+      }
+
+      if (counts[j].count < counts[j + 1].count) {
+        val tmp = counts[j];
+        counts[j] = counts[j + 1];
+        counts[j + 1] = tmp;
+      }
+    }
+  }
+
+  ret counts;
+}
+
+loc fn index_of_letter(counts, letter) {
+  for (rw val i = 0; i < #counts; i++) {
+    if (counts[i].char == letter) -> i;
+  }
+
+  ret -1;
+}
+
+loc fn is_valid_checksum(counts, checksum) {
+  each (rw val c : checksum) {
+    val i = index_of_letter(counts, c);
+    if (i < 0 || i > 4) -> false;
+  }
+
+  ret true;
+}
+
+loc fn part_1() {
+  rw val sum = 0;
+  val real_rooms = array { };
+
+  each (rw val line : lines) {
+    
+    val matches = str.rmatch(line, regex);
+    val match = matches[0];
+
+    val room_name = match.groups["room_name"].value;
+    val room_id = $match.groups["room_id"].value;
+    val checksum = match.groups["checksum"].value;
+
+    val counts = count_and_sort_letter_occurrences(room_name);
+    if (is_valid_checksum(counts, checksum)) {
+      sum += room_id;
+      arr.push(real_rooms, {
+        name: str.trim(room_name, '-'),
+        id: room_id
+      });
+    }
+  }
+
+  io.println(sum);
+  ret real_rooms;
+}
+
+loc fn decrypt_name(room) {
+  rw val decrypted_name = "";
+
+  each (rw val c : room.name) {
+    if (c == '-') {
+      decrypted_name += ' ';
+    } else {
+      val char_index = arr.index_of(alphabet, c);
+      val new_index = (char_index + room.id) % #alphabet;
+      decrypted_name += alphabet[new_index];
+    }
+  }
+
+  room.name = decrypted_name;
+}
+
+loc fn part_2(real_rooms) {
+  each (rw val room : real_rooms) {
+    decrypt_name(room);
+
+    if (str.starts_with(room.name, "northpole")) {
+      io.println(room.name, room.id);
+    }
+  }
+}
+
+val real_rooms = part_1();
+part_2(real_rooms);
