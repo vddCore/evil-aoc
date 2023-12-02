@@ -1,0 +1,55 @@
+require("classes.Triangle");
+
+val num_regex = "(\\s+)?(?<number>\\d+)";
+val lines = fs.file.get_lines("d3.dat");
+
+loc fn part_1() {
+  rw val valid_tris = 0;
+
+  each (rw val line : lines) {
+    val matches = str.rmatch(line, num_regex);
+
+    val a = $matches[0].groups[2].value;
+    val b = $matches[1].groups[2].value;
+    val c = $matches[2].groups[2].value;
+
+    valid_tris += $Triangle::new(a, b, c)::is_valid();
+  }
+
+  io.println(valid_tris);
+}
+
+loc fn part_2() {
+  rw val valid_tris = 0;
+
+  for (rw val i = 0; i < #lines; i += 3) {
+    val matches = array {
+      str.rmatch(lines[i    ], num_regex),
+      str.rmatch(lines[i + 1], num_regex),
+      str.rmatch(lines[i + 2], num_regex)
+    };
+
+    valid_tris += $Triangle::new(
+      $matches[0][0].groups[2].value,
+      $matches[1][0].groups[2].value,
+      $matches[2][0].groups[2].value,
+    )::is_valid();
+
+    valid_tris += $Triangle::new(
+      $matches[0][1].groups[2].value,
+      $matches[1][1].groups[2].value,
+      $matches[2][1].groups[2].value,
+    )::is_valid();
+
+    valid_tris += $Triangle::new(
+      $matches[0][2].groups[2].value,
+      $matches[1][2].groups[2].value,
+      $matches[2][2].groups[2].value,
+    )::is_valid();
+  }
+
+  io.println(valid_tris);
+}
+
+part_1();
+part_2();

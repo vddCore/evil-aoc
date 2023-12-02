@@ -1,0 +1,15 @@
+Triangle = { new: self::fn(a, b, c) -> {
+  a: a,
+  b: b,
+  c: c,
+
+  is_valid: self::fn() {
+    if (self.a !is Number || self.b !is Number || self.c !is Number) {
+      core.fail("a, b and c must be numbers.,");
+    }
+
+    ret (self.a + self.b) > self.c
+     && (self.a + self.c) > self.b
+     && (self.b + self.c) > self.a;
+  }
+}};
