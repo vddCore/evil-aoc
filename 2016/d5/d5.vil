@@ -1,0 +1,57 @@
+val door_id = "wtnhxymk";
+
+loc fn find_hash_value(door_id, rw salt) {
+  while (true) {
+    val hash = str.md5(door_id + @salt++);
+
+    if (str.starts_with(hash, "00000")) -> {
+      hash: hash,
+      salt: salt,
+      v1: { char: hash[5] },
+      v2: { index: hash[5], char: hash[6] }
+    };
+  }
+}
+
+loc fn part_1() {
+  rw val password = "";
+  rw val last_salt = 0;
+  for (rw val i = 0; i < 8; i++) {
+    val data = find_hash_value(door_id, last_salt);
+    password += data.v1.char;
+    last_salt = data.salt;
+    io.println(data.hash);
+  }
+  io.println("---");
+  io.println(password);
+}
+
+loc fn part_2() {
+  val password = array(8);
+  rw val valid_char_count = 0;
+  rw val last_salt = 0;
+
+  while (valid_char_count < 8) {
+    val data = find_hash_value(door_id, last_salt);
+    last_salt = data.salt;
+
+    val index = $data.v2.index;
+
+    if (index is Nil || index > 7 || password[index] != nil) {
+      skip;
+    }
+
+    io.println(data.hash);
+    password[index] = data.v2.char;
+    valid_char_count++;
+  }
+
+  io.println("---");
+  each (rw val c : password) {
+    io.print(c);
+  }
+}
+
+part_1();
+io.println("< === >")
+part_2();
