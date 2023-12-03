@@ -86,7 +86,7 @@ loc fn part_2() {
     ret false;
   });
 
-  each (rw val k, a : asterisk_numbers) {
+  each (rw val a : asterisk_numbers) {
     if (#a > 1) {
       rw val ratio = 1;
       
@@ -97,7 +97,7 @@ loc fn part_2() {
       sum += ratio;
     }
   } 
-  
+
   io.println(sum);
 }
 
