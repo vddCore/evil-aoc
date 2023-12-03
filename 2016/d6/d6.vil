@@ -1,0 +1,70 @@
+val lines = fs.file.get_lines("d6.dat");
+
+loc fn sort_by_freq(arr, asc = false) {
+  for (rw val i = 0; i < #arr - 1; i++) {
+    for (rw val j = 0; j < #arr - i - 1; j++) {
+      val swap = asc
+        ? arr[j].count > arr[j + 1].count
+        : arr[j].count < arr[j + 1].count;
+
+      if (swap) {
+        val tmp = arr[j];
+        arr[j] = arr[j + 1];
+        arr[j + 1] = tmp;
+      }
+    }
+  }
+}
+
+loc fn part_1() {
+  val message = array(#lines[0]);
+  for (rw val i = 0; i < #message; i++) {
+    val letters = { };
+    val sortable = array { };
+
+    for (rw val j = 0; j < #lines; j++) {
+      letters[lines[j][i]] ??= 0;
+      letters[lines[j][i]]++;
+    }
+
+    each (rw val l, c : letters) {
+      arr.push(sortable, {char: l, count: c});
+    }
+
+    sort_by_freq(sortable);
+    message[i] = sortable[0].char;
+  }
+
+  each (rw val c : message) {
+    io.print(c);
+  }
+  io.println();
+}
+
+loc fn part_2() {
+  val message = array(#lines[0]);
+  for (rw val i = 0; i < #message; i++) {
+    val letters = { };
+    val sortable = array { };
+
+    for (rw val j = 0; j < #lines; j++) {
+      letters[lines[j][i]] ??= 0;
+      letters[lines[j][i]]++;
+    }
+
+    each (rw val l, c : letters) {
+      arr.push(sortable, {char: l, count: c});
+    }
+
+    sort_by_freq(sortable, true);
+    message[i] = sortable[0].char;
+  }
+
+  each (rw val c : message) {
+    io.print(c);
+  }
+  io.println();
+}
+
+part_1();
+part_2();
