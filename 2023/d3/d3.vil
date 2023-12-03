@@ -1,0 +1,105 @@
+val strcode = str.code;
+
+loc fn is_digit(chr) -> strcode(chr) >= 0x30 && strcode(chr) <= 0x39;
+loc fn is_symbol(chr) -> chr in "!@#$%^&*()/=+-";
+loc fn is_gear(chr) -> chr == "*";
+
+val data = fs.file.get_lines("d3.dat");
+
+val map_data = { };
+for (rw val i = 0; i < #data; i++) {
+  map_data[i] = data[i];
+}
+
+val width = #map_data[0];
+
+loc fn walk_map(on_symbol) {
+  rw val current_number = "";
+  rw val starting_num_x = -1;
+  rw val starting_num_y = -1;
+
+  for (rw val y = 0; y < #map_data; y++) {
+    for (rw val x = 0; x < width; x++) {
+      if (map_data[y][x] == ".") skip;
+
+      if (is_digit(map_data[y][x])) {
+        rw val break_out = false;
+
+        current_number = "";
+        starting_num_x = x;
+        starting_num_y = y;
+
+        while (is_digit(map_data[y][x])) {
+          current_number += map_data[y][x];
+          x++;
+
+          if (x >= width) break;
+        }
+
+        val perimeter_start_x = starting_num_x - 1;
+        val perimeter_start_y = starting_num_y - 1;
+
+        for (rw val perimeter_y = perimeter_start_y; perimeter_y < perimeter_start_y + 3 && !break_out; perimeter_y++) {        
+          for (rw val perimeter_x = perimeter_start_x; perimeter_x < perimeter_start_x + #current_number + 2 && !break_out; perimeter_x++) {
+            if (!map_data[perimeter_y]) skip;
+            if (!map_data[perimeter_y][perimeter_x]) skip;
+
+            if (is_symbol(map_data[perimeter_y][perimeter_x])) {
+              break_out = on_symbol(
+                $current_number, 
+                map_data[perimeter_y][perimeter_x], 
+                perimeter_x, 
+                perimeter_y
+              );
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+loc fn part_1() {
+  rw val sum = 0;
+
+  walk_map(fn(number, sym, sym_x, sym_y) {
+    sum += number;
+    ret true;
+  });
+
+  io.println(sum);
+}
+
+loc fn part_2() {
+  rw val sum = 0;
+  val asterisk_numbers = { };
+
+  walk_map(fn(number, sym, sym_x, sym_y) {
+    if (is_gear(sym)) {
+      val key = "$sym_x,$sym_y";
+
+      asterisk_numbers[key] ??= array { };
+      arr.push(asterisk_numbers[key], $number);
+      ret true;
+    }
+
+    ret false;
+  });
+
+  each (rw val k, a : asterisk_numbers) {
+    if (#a > 1) {
+      rw val ratio = 1;
+      
+      for (rw val i = 0; i < #a; i++) {
+        ratio *= a[i];
+      }
+
+      sum += ratio;
+    }
+  } 
+  
+  io.println(sum);
+}
+
+part_1();
+part_2();
