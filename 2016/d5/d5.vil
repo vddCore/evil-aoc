@@ -53,5 +53,5 @@ loc fn part_2() {
 }
 
 part_1();
-io.println("< === >")
+io.println("< === >");
 part_2();
