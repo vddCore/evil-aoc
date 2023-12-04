@@ -1,0 +1,37 @@
+val regex = "Card\\s*(?<card_id>\\d+):\\s*(?<winning>((\\d+)\\s*)+)\\s*\\|\\s*(?<owned>((\\d+)\\s*)+)";
+
+ret { new: self::fn(text) {
+  val match = str.rmatch(text, regex)[0];
+
+  val obj = {
+    __text: text,
+
+    get_match_count: self::fn() {
+      rw val count = 0;
+      
+      each (rw val owned : self.owned) {
+        if (owned in self.winning) count++;
+      }
+
+      ret count;
+    },
+
+    get_value: self::fn() {
+      rw val card_value = 0;
+      each (rw val owned : self.owned) {
+        if (owned in self.winning) {
+          if (card_value) card_value *= 2;
+          else card_value = 1;
+        }
+      }
+
+      ret card_value;
+    }
+  };
+
+  obj.id = $match.groups.card_id.value;
+  obj.winning = str.spl(match.groups.winning.value, " ", true);
+  obj.owned = str.spl(match.groups.owned.value, " ", true);
+
+  ret obj;
+}};

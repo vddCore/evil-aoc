@@ -1,0 +1,41 @@
+val Card = require("classes.Card");
+
+val lines = fs.file.get_lines("d4.dat");
+
+loc fn part_1() {
+  rw val sum = 0;
+
+  each (rw val line : lines) {
+    val card = Card::new(line);
+    sum += card::get_value();
+  }
+
+  io.println(sum);
+}
+
+loc fn part_2() {
+  val cards = array { };
+  val wins = array { };
+
+  each (rw val line : lines) {
+    val card = Card::new(line);
+    arr.push(cards, card);
+    arr.push(wins, card);
+  }
+
+  while (#wins) {
+    val card = arr.lsh(wins);
+    val match_count = card::get_match_count();
+
+    for (rw val i = 0; i < match_count; i++) {
+      rw val new_card = Card::new(lines[card.id + i]);
+      arr.push(cards, new_card);
+      arr.push(wins, new_card);
+    }
+  }
+
+  io.println(#cards);
+}
+
+part_1();
+part_2(); // that's gonna take some time.
