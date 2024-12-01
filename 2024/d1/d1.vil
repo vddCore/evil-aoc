@@ -1,0 +1,70 @@
+fn bubble_sort_array(arr) { /* xddd idgaf. rawr x3 */
+  rw val i, t, j = #arr, s = true;
+  
+  while (s) {
+    s = false;
+    
+    for (i = 1; i < j; i++) {
+      if (arr[i] < arr[i - 1]) {
+        t = arr[i];
+        arr[i] = arr[i - 1];
+        arr[i - 1] = t;
+        s = true;
+      }
+    }
+    
+    j--;
+  }
+}
+
+val lines = fs.file.get_lines("d1.dat");
+
+val left = array(0);
+val right = array(0);
+
+io.println("parsing...");
+each (rw val v : lines) {
+  val llen = #left;
+  val rlen = #right;
+
+  val pair = v::spl('   ');
+  arr.push(left, $pair[0]);
+  arr.push(right, $pair[1]);
+}
+
+io.println("sorting...");
+bubble_sort_array(left);
+bubble_sort_array(right);
+
+fn p1 {
+  llen = #left;
+  rlen = #right;
+  rw val sum = 0;
+
+  for (rw val i = 0; i < llen; i++) {
+    sum += math.abs(left[i] - right[i]);
+  }
+
+  io.println(sum);
+}
+
+fn p2 {
+  /* no fucks given, p1 already updated lengths for us. */
+  rw val simscore = 0;
+
+  for (rw val i = 0; i < llen; i++) {
+    rw val multiplier = 0;
+    for (rw val j = 0; j < rlen; j++) {
+      if (left[i] == right[j]) {
+        multiplier++;
+      }
+    }
+
+    simscore += left[i] * multiplier;
+  }
+
+  io.println(simscore);
+}
+
+p1();
+p2();
