@@ -1,0 +1,135 @@
+  /**
+   * to future aura:
+   *   yeah. the computational complexity 
+   *   of this is as bad as it gets.
+   *
+   **  sorry, girlie~ **/
+
+val lines = fs.file.get_lines("d4.dat");
+
+val height = #lines;
+val width = #lines[0];
+
+val lookups = {
+  left_down: fn(word, sx, sy) {
+    for (rw val i = 0; i < #word; i++) {
+      if (sy + i >= height) -> false;
+      if (word[i] != lines[sy + i][sx - i]) -> false;
+    }
+
+    ret true;
+  },
+
+  left: fn(word, sx, sy) {
+    for (rw val i = 0; i < #word; i++) {
+      if (word[i] != lines[sy][sx - i]) -> false;
+    }
+
+    ret true;
+  },
+
+  left_up: fn(word, sx, sy) {
+    for (rw val i = 0; i < #word; i++) {
+      if (sy - i < 0) -> false;
+      if (word[i] != lines[sy - i][sx - i]) -> false;
+    }
+
+    ret true;
+  },
+
+  up: fn(word, sx, sy) {
+    for (rw val i = 0; i < #word; i++) {
+      if (sy - i < 0) -> false;
+      if (word[i] != lines[sy - i][sx]) -> false;
+    }
+
+    ret true;
+  },
+
+  right_up: fn(word, sx, sy) {
+    for (rw val i = 0; i < #word; i++) {
+      if (sy - i < 0) -> false;
+      if (word[i] != lines[sy - i][sx + i]) -> false;
+    }
+
+    ret true;
+  },
+
+  right: fn(word, sx, sy) {
+    for (rw val i = 0; i < #word; i++) {
+      if (word[i] != lines[sy][sx + i]) -> false;
+    }
+
+    ret true;
+  },
+
+  right_down: fn(word, sx, sy) {
+    for (rw val i = 0; i < #word; i++) {
+      if (sy + i >= height) -> false;
+      if (word[i] != lines[sy + i][sx + i]) -> false;
+    }
+
+    ret true;
+  },
+
+  down: fn(word, sx, sy) {
+    for (rw val i = 0; i < #word; i++) {
+      if (sy + i >= height) -> false;
+      if (word[i] != lines[sy + i][sx]) -> false;
+    }
+
+    ret true;
+  }
+};
+
+loc fn find_words(words, sx, sy) {
+  rw val count = 0;
+
+  each (rw val word : words) {
+    count += $lookups.left_down(word, sx, sy);
+    count += $lookups.left(word, sx, sy);
+    count += $lookups.left_up(word, sx, sy);
+    count += $lookups.up(word, sx, sy);
+    count += $lookups.right_up(word, sx, sy);
+    count += $lookups.right(word, sx, sy);
+    count += $lookups.right_down(word, sx, sy);
+    count += $lookups.down(word, sx, sy);
+  }
+
+  ret count;
+}
+
+fn p1 {
+  rw val count = 0;
+
+  for (rw val y = 0; y < height; y++) {
+    for (rw val x = 0; x < width; x++) {
+      count += find_words(array { "XMAS" }, x, y);
+    }
+  }
+
+  io.println(count);
+}
+
+fn p2 {
+  rw val count = 0;
+
+  for (rw val y = 1; y < height - 1; y++) {
+    for (rw val x = 1; x < width - 1; x++) {
+      if (lines[y][x] == "A") {
+        if ((lines[y - 1][x - 1] == "M" && lines[y + 1][x + 1] == "S")
+             ||(lines[y - 1][x - 1] == "S" && lines[y + 1][x + 1] == "M"))  {
+          count += $(
+            (lines[y + 1][x - 1] == "M" && lines[y - 1][x + 1] == "S")
+             || (lines[y + 1][x - 1] == "S" && lines[y - 1][x + 1] == "M")
+          );
+        }
+      }
+    }
+  }
+
+  io.println(count);
+}
+
+p1();
+p2();
