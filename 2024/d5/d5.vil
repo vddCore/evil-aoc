@@ -1,0 +1,99 @@
+  /**
+   * to future aura:
+   *   yes i know.
+   *   no you shouldn't.
+   *   just fix it at some point.
+   *
+   **  much love~ **/
+
+val lines = fs.file.get_lines("d5.dat");
+
+val rules = array(0);
+val updates = array(0);
+
+rw val parsing_rules = true;
+each (rw val line : lines) {
+  if (!#line) {
+    parsing_rules = false;
+    skip;
+  }
+
+  if (parsing_rules) {
+    val rule = line::spl("|");
+
+    rules::push({
+      page: $rule[0],
+      before: $rule[1]
+    });
+  } else {
+    val pages = line::spl(",");
+
+    for (rw val i = 0; i < #pages; i++)
+      pages[i] = $pages[i];
+
+    updates::push({
+      pages: pages,
+      was_reordered: false
+    });
+  }
+}
+
+fn p1 {
+  rw val sum = 0;
+
+  each (rw val update : updates) {
+    rw val valid = true;
+
+    each (rw val rule : rules) {
+      val ia = update.pages::index_of(rule.page);
+      if (ia < 0) skip;
+
+      val ib = update.pages::index_of(rule.before);
+      if (ib < 0) skip;
+
+      valid &= ia < ib;
+      if (!valid) break;
+    }
+
+    if (valid) {
+      sum += update.pages[#update.pages / 2];
+    }
+  }
+
+  io.println(sum);
+}
+
+fn p2 {
+  rw val sum = 0;
+
+  each (rw val update : updates) {
+    for (rw val i = 0; i < #update.pages; i++) {
+      each (rw val rule : rules) {
+        val ia = update.pages::index_of(rule.page);
+        if (ia < 0) skip;
+
+        val ib = update.pages::index_of(rule.before);
+        if (ib < 0) skip;
+
+        if (ia > ib) {
+          val tmp = update.pages[ia];
+
+          update.pages[ia] = update.pages[ib];
+          update.pages[ib] = tmp;
+          update.was_reordered = true;
+        }
+      }
+    }
+  }
+
+  each (rw val update : updates) {
+    if (update.was_reordered) {
+      sum += update.pages[#update.pages / 2];
+    }
+  }
+
+  io.println(sum);
+}
+
+p1();
+p2();
