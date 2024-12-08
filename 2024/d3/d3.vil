@@ -1,0 +1,39 @@
+val lines = fs.file.get_lines("d3.dat");
+
+fn p1 {
+  rw val sum = 0;
+
+  each (rw val line : lines) {
+    val matches = line::rmatch("mul\\((?<a>\\d{1,3}),(?<b>\\d{1,3})\\)");
+
+    each (rw val match : matches) {
+      sum += $match.groups.a.value * $match.groups.b.value;
+    }
+  }
+
+  io.println(sum);
+}
+
+fn p2() {
+  rw val sum = 0;
+  rw val enabled = true;
+
+  each (rw val line : lines) {
+    val matches = line::rmatch("mul\\((?<a>\\d{1,3}),(?<b>\\d{1,3})\\)|do\\(\\)|don\\'t\\(\\)");
+
+    each (rw val match : matches) {
+      if (match.value == "do()") {
+        enabled = true;
+      } elif (match.value == "don't()") {
+        enabled = false;
+      } elif(enabled) {
+        sum += $match.groups.a.value * $match.groups.b.value;
+      }
+    }
+  }
+
+  io.println(sum);
+}
+
+p1();
+p2();

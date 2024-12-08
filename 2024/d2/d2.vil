@@ -1,0 +1,100 @@
+val lines = fs.file.get_lines("d2.dat");
+
+each (rw val i, v : lines) {
+  val numbers = v::spl(' ');
+
+  for (rw val j = 0; j < #numbers; j++)
+    numbers[j] = $numbers[j];
+
+  lines[i] = numbers;
+}
+
+loc fn check_strict(report) {
+  rw val direction = nil;
+
+  for (rw val i = 1; i < #report; i++) {
+    val a = report[i - 1];
+    val b = report[i];
+    val diff = a - b;
+
+    if (!diff) {
+      throw error("no change ($a == $b)") 
+            { fault_at: i };
+    }
+    
+    val abs = math.abs(diff);
+    if (abs > 3) {
+      throw error("change out of range ($abs)") 
+            { fault_at: i };
+    }
+
+    val sign = math.sign(diff);
+    if (direction is Nil) {
+      direction = sign;
+    } elif (direction != sign) {
+      throw error("direction mismatch ($direction -> $sign)") 
+            { fault_at: i };
+    }
+  }
+}
+
+fn check_tolerant(report) {
+  rw val attempts = 3,
+         fault_at = nil,
+         checked = report;
+
+  try {
+    check_strict(checked);
+  } catch (e) {
+    fault_at ??= e.fault_at;
+
+    val copy = array(#report);
+    each (rw val i, v : report)
+      copy[i] = v;
+
+    checked = copy;
+
+    if (attempts == 3) {
+      arr.delete(copy, fault_at);
+      attempts--;
+      retry;
+    } elif (attempts == 2) {
+      arr.delete(copy, fault_at - 1);
+      attempts--;
+      retry;
+    } elif (attempts == 1) {
+      arr.delete(copy, fault_at - 2);
+      attempts--;
+      retry;
+    } else throw e;
+  }
+}
+
+fn p1 {
+  rw val safe_count = 0;
+
+  each (rw val report : lines) {
+    try { 
+      check_strict(report);
+      safe_count++;
+    } catch { /* ignore */ }
+  }
+
+  io.println(safe_count);
+}
+
+fn p2 {
+  rw val safe_count = 0;
+
+  each (rw val report : lines) {
+    try {
+      check_tolerant(report);
+      safe_count++;
+    } catch { /* ignore */ }
+  }
+
+  io.println(safe_count);
+}
+
+p1();
+p2();
